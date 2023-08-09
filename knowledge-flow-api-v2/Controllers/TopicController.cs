@@ -27,7 +27,7 @@ public class TopicController : ControllerBase
         _context.Topics.Add(topic);
         await _context.SaveChangesAsync();
 
-        return Ok(new { Message = "Topic successfully created.", TopicId = topic.Id });
+        return Ok(new { Message = "Topic created successfully." });
     }
 
     [HttpGet]
@@ -45,31 +45,47 @@ public class TopicController : ControllerBase
 
         if (topic == null)
         {
-            return NotFound();
+            return NotFound(new { ErrorMessage = "Topic not found." });
         }
 
         return Ok(topic);
     }
 
-    // PUT api/<ValuesController1>/5
     [HttpPut("{id}")]
-    public void Put(int id, [FromBody] string value)
+    public async Task<ActionResult> Put(int id, [FromBody] Topics topic)
     {
+        if (topic == null)
+        {
+            return NotFound(new { ErrorMessage = "Invalid input data." });
+        }
+
+        var existingTopic = await _context.Topics.FirstOrDefaultAsync(t => t.Id == id);
+
+        if (existingTopic == null)
+        {
+            return NotFound(new { ErrorMessage = "Topic not found." });
+        }
+
+        existingTopic.Title = topic.Title;
+
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Topic updated successfully." });
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult<Topics>> Delete(int id)
+    public async Task<ActionResult> Delete(int id)
     {
         var topic = await _context.Topics.FirstOrDefaultAsync(t => t.Id == id);
 
         if (topic == null)
         {
-            return NotFound();
+            return NotFound(new { ErrorMessage = "Topic not found." });
         }
 
         _context.Topics.Remove(topic);
         await _context.SaveChangesAsync();
 
-        return Ok(new { message = "Topic deleted successfully.", TopicId = topic.Id });
+        return Ok(new { message = "Topic deleted successfully." });
     }
 }
