@@ -31,11 +31,23 @@ public class TopicController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Topics>>> Get()
+    public async Task<ActionResult<IEnumerable<Topics>>> Get(int? id)
     {
-        var topics = await _context.Topics.ToListAsync();
+        if (id.HasValue)
+        {
+            var parentTopic = await _context.Topics.Where(t => t.ParentId == id).ToListAsync();
 
-        return Ok(topics);
+            if (parentTopic == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(parentTopic);
+        }
+
+        var nonChildTopics = await _context.Topics.Where(t => t.ParentId == null).ToListAsync();
+
+        return Ok(nonChildTopics);
     }
 
     [HttpGet("{id}")]
