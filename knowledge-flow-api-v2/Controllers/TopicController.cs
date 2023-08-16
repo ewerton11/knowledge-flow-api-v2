@@ -37,11 +37,6 @@ public class TopicController : ControllerBase
         {
             var parentTopic = await _context.Topics.Where(t => t.ParentId == id).ToListAsync();
 
-            if (parentTopic == null)
-            {
-                return NotFound();
-            }
-
             return Ok(parentTopic);
         }
 
