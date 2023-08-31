@@ -80,6 +80,23 @@ public class TopicController : ControllerBase
         return Ok(new { message = "Topic updated successfully." });
     }
 
+    [HttpPatch("toggle/{id}")]
+    public async Task<ActionResult> ToggleCheckedStatus(int id)
+    {
+        var topic = await _context.Topics.FirstOrDefaultAsync(t => t.Id == id);
+
+        if (topic == null)
+        {
+            return NotFound(new { ErrorMessage = "Topic not found." });
+        }
+
+        topic.IsChecked = !topic.IsChecked;
+
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Topic status toggled successfully.." });
+    }
+
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(int id)
     {
